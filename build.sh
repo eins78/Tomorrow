@@ -1,23 +1,26 @@
-rm output/ -rf
+#!/bin/bash
+set -e
+
+rm -rf output/
 
 for src in src/*.glyphs
 do
-  fontmake -g $src -o ttf -i --output-dir output/
+  fontmake -g "$src" -o ttf --output-dir output/
 done
 
 for font in output/*.ttf
 do
-  gftools fix-nonhinting $font $font
-  gftools fix-dsig $font --autofix
+  gftools fix-nonhinting "$font" "$font"
 done
 
-# Cleanup gftools mess:
-rm output/*-backup-fonttools-prep-gasp.ttf
+# Cleanup gftools backup files:
+rm -f output/*-backup-fonttools-prep-gasp.ttf
 
-cp DESCRIPTION.*.html METADATA.pb OFL.txt output
+cp DESCRIPTION.*.html METADATA.pb OFL.txt output/
 
-export OPTIONS="--no-progress"
-export OPTIONS="$OPTIONS --exclude-checkid /check/ftxvalidator" # We lack this on Travis.
-export OPTIONS="$OPTIONS --exclude-checkid /check/varfont" # Comment this out when making a variable font.
-export OPTIONS="$OPTIONS --loglevel INFO --ghmarkdown Tomorrow-fontbakery.md"
-fontbakery check-googlefonts $OPTIONS output/*.ttf
+fontbakery check-googlefonts \
+  --no-progress \
+  -x googlefonts/glyphsets/shape_languages \
+  --loglevel INFO \
+  --ghmarkdown Tomorrow-fontbakery.md \
+  output/*.ttf
