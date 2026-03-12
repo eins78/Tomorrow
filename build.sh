@@ -18,6 +18,9 @@ done
 # Cleanup gftools backup files:
 rm -f output/*-backup-fonttools-prep-gasp.ttf
 
+# Fix usWeightClass and style flags (not set correctly by fontmake for single-master sources)
+uv run $DEPS python3 fix_weights.py
+
 cp DESCRIPTION.*.html METADATA.pb OFL.txt output/
 
 uv run $DEPS fontbakery check-googlefonts \
